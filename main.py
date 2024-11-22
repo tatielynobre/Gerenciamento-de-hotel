@@ -2,8 +2,11 @@ from typing import Union
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from http import HTTPStatus
+import csv
+import json
 
 app = FastAPI()
+
 
 ##formato esperado
 class Reserva(BaseModel):
@@ -13,8 +16,27 @@ class Reserva(BaseModel):
         data_fim: str
         nivel_quarto: str # Standard, Master, Deluxe
 
+reservas = {
+    1: Reserva(id_quarto=101, id_cliente=202, data_inicio="2024-12-01", data_fim="2024-12-10", nivel_quarto="Deluxe"),
+    2: Reserva(id_quarto=102, id_cliente=203, data_inicio="2024-12-05", data_fim="2024-12-12", nivel_quarto="Master")
+}
+
+#teste csv
+def iniciar_csv():
+    with open('reservas.csv', 'w',newline='') as file:
+        campos=['id_quarto','id_cliente','data_inicio','data_fim','nivel_quarto']
+        writer = csv.DictWriter(file, fieldnames=campos)
+        writer.writeheader()
+
+def add_reserva_csv(reserva):
+    with open('reservas.csv', mode="a", newline='') as file:
+        campos=['id_quarto','id_cliente','data_inicio','data_fim','nivel_quarto']
+        writer = csv.DictWriter(file, fieldnames=campos)
+        writer.writerow(reserva)
+##fim
+
 ##apenas cod teste
-@app.post('/reserva')
+@app.post('/reserva/')
 def criar_reserva(reserva: Reserva):
     id_reserva = max(reservas.keys()) + 1 if reservas else 1
     reservas[id_reserva] = reserva
@@ -24,16 +46,15 @@ def criar_reserva(reserva: Reserva):
         "dados": reserva
     }
 
-reservas = {
-    1: Reserva(id_quarto=101, id_cliente=202, data_inicio="2024-12-01", data_fim="2024-12-10", nivel_quarto="Deluxe"),
-    2: Reserva(id_quarto=102, id_cliente=203, data_inicio="2024-12-05", data_fim="2024-12-12", nivel_quarto="Master")
-}
+@app.get("/reserva/")
+def lista_total():
+    return reservas
 
 @app.get("/reserva/{reserva_id}")
 def exibir_reserva(reserva_id: int):
     if reserva_id in reservas:
-         return reservas[reserva_id]  
-    return {"message": "Reserva não encontrada"}
+        raise HTTPException(status_code=404, detail="Reserva não encontrada")
+    return reservas[reserva_id]  
 
 @app.delete("/reserva/{reserva_id}")
 def apagar_reserva(reserva_id: int):
