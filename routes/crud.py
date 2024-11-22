@@ -1,9 +1,13 @@
 from basemodel import Reserva
-from fastapi import FastAPI, HTTPException
+from fastapi import APIRouter, HTTPException
+from http import HTTPStatus
 
-@app.post('/reserva/')
+
+router = APIRouter()
+
+@router.post('/reserva/')
 def criar_reserva(reserva: Reserva):
-    id_reserva = max(reservas.keys()) + 1 if reservas else 1
+    id_reserva = max(reservas.keys()) + 1 if reservas else 1 # precisa arrumar essa parte das reservas pra ele ir atualizando diretamente no csv
     reservas[id_reserva] = reserva
     return {
         "message": "Reserva criada",
@@ -11,17 +15,17 @@ def criar_reserva(reserva: Reserva):
         "dados": reserva
     }
 
-@app.get("/reserva/")
+@router.get("/reserva/")
 def lista_total():
     return reservas
 
-@app.get("/reserva/{reserva_id}")
+@router.get("/reserva/{reserva_id}")
 def exibir_reserva(reserva_id: int):
     if reserva_id in reservas:
         raise HTTPException(status_code=404, detail="Reserva não encontrada")
     return reservas[reserva_id]  
 
-@app.delete("/reserva/{reserva_id}")  # noqa: F821
+@router.delete("/reserva/{reserva_id}")  # noqa: F821
 def apagar_reserva(reserva_id: int):
     if reserva_id not in reservas:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Reserva não encontrada.")
@@ -30,7 +34,7 @@ def apagar_reserva(reserva_id: int):
     return {"message": "Reserva removida com sucesso!"}
 
 
-@app.put("/reserva/{reserva_id}")
+@router.put("/reserva/{reserva_id}")
 def atualizar_reserva(reserva_id: int, reserva_atualizada: Reserva):
     if reserva_id not in reservas:
         raise HTTPException(status_code=HTTPStatus.NOT_FOUND, detail="Reserva não encontrada.")
