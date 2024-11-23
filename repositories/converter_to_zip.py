@@ -2,6 +2,7 @@
 import zipfile
 import os
 
+csv_file = 'files/reservas.csv'
 
 def Compact_csv(csv_file):
         if not os.path.isfile(csv_file):
