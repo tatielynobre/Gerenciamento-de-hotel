@@ -1,6 +1,6 @@
 import csv
 from fastapi import HTTPException
-from basemodel import Reserva
+from models import Reserva
 
 # Definindo os campos que vão para o CSV
 csv_file = 'files/reservas.csv'

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 from http import HTTPStatus
-from basemodel import Reserva
+from models import Reserva
 from repositories.csv_manager import carregar_reservas, salvar_reserva_csv, apagar_reserva_csv, atualizar_reserva_csv
 
 router = APIRouter()
